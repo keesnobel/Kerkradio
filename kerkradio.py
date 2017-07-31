@@ -232,8 +232,6 @@ def power():
 					currentChannel = Max_Gebouw
 				lcd.display_string(Gebouw[currentChannel],1)
 				os.system("sudo mpc play " + str(currentChannel))
-				os.system("sudo mpc volume " + str(Volume))
-				lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
 
 ######## Rechts
 			rechts_val = GPIO.input(RECHTS)
@@ -246,8 +244,6 @@ def power():
 					currentChannel=1
 				lcd.display_string(Gebouw[currentChannel],1)
 				os.system("sudo mpc play " + str(currentChannel))
-				os.system("sudo mpc volume " + str(Volume))
-				lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
 
 ######## Beheer Menu #########################################################################################
 # met de links en rechts knop tegelijk ingedrukt kom je in het "beheer menu" zodra de led uit is
@@ -378,5 +374,6 @@ if __name__ == '__main__':     # Program start from here
 		power()
 	except KeyboardInterrupt:
 		Afsluiten()
-
+	finally:	
+		Afsluiten()
 #End
