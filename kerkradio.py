@@ -81,7 +81,7 @@ def test():
 		except:
 			pass
 		if dl>0.1 or ul>=0.1:
-			time.sleep(0.2) 
+			time.sleep(0.5) 
 			lcd.display_string(('UL= {:0.2f} kB/s'.format(ul)), 1)
 			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
 
@@ -89,7 +89,7 @@ def CpuTest():
 	CPU_Pct=psutil.cpu_percent()
 	lcd.display_string("CPU Usage", 1)
  	lcd.display_string((str(CPU_Pct)),2)
-	time.sleep(0.2)
+	time.sleep(0.5)
 
 def LoadTest():
 	Load=os.getloadavg()
@@ -146,7 +146,7 @@ def power():
 	Max_Gebouw = 5
 	Gebouw = ['               ', 'Hekendorp       ', 'Oudewater       ', 'Hekendorp 2    ', 'Grootnieuws    ', 'RO 1           '];
 	currentChannel = 1
-	Volume = 10
+	Volume = 50
 	TIJD = datetime.now().strftime("%H:%M:%S")
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
