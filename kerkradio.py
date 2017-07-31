@@ -126,7 +126,7 @@ def power():
 	Max_Gebouw = 5
 	Gebouw = ['               ', 'Hekendorp       ', 'Oudewater       ', 'Hekendorp 2    ', 'Grootnieuws    ', 'RO 1           '];
 	currentChannel = 1
-	Volume = 10
+	Volume = 50
 	TIJD = datetime.now().strftime("%H:%M:%S")
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
