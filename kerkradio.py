@@ -373,5 +373,8 @@ if __name__ == '__main__':     # Program start from here
 	try:
 		power()
 	except KeyboardInterrupt:
+		print "  Exit kerkradio"
+	finally:
 		Afsluiten()
-#End
+
+### einde
