@@ -374,6 +374,4 @@ if __name__ == '__main__':     # Program start from here
 		power()
 	except KeyboardInterrupt:
 		Afsluiten()
-	finally:	
-		Afsluiten()
 #End
