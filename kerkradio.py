@@ -1,6 +1,6 @@
 #!/usr/bin/python
 ##
-# Kerkradio versie 2.0
+# Kerkradio versie 3.0
 # Kees Nobel
 # Twitter: @keesnobel
 
