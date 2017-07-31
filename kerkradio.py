@@ -57,10 +57,18 @@ def test():
 
 	while True:
 		sleep(0.3)
-		if((GPIO.input(OP)==False)):
+		if((GPIO.input(LINKS)==False)):
 			return
-		if((GPIO.input(NEER)==False)):
-			return
+		if((GPIO.input(RECHTS)==False)):
+			while True:
+				CpuTest()
+				if((GPIO.input(LINKS)==False)):
+					return
+				if ((GPIO.input(RECHTS)==False)):
+					while True:
+						LoadTest()
+						if((GPIO.input(LINKS)==False)):
+							return							
 		last_up_down = up_down
 		upload=psutil.net_io_counters(pernic=True)['wlan0'][0]
 		download=psutil.net_io_counters(pernic=True)['wlan0'][1]
@@ -73,9 +81,21 @@ def test():
 		except:
 			pass
 		if dl>0.1 or ul>=0.1:
-			time.sleep(0.75) 
+			time.sleep(0.2) 
 			lcd.display_string(('UL= {:0.2f} kB/s'.format(ul)), 1)
 			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
+
+def CpuTest():
+	CPU_Pct=psutil.cpu_percent()
+	lcd.display_string("CPU Usage", 1)
+ 	lcd.display_string((str(CPU_Pct)),2)
+	time.sleep(0.2)
+
+def LoadTest():
+	Load=os.getloadavg()
+	lcd.display_string("Load average", 1)
+ 	lcd.display_string((str(Load)),2)
+	time.sleep(0.2)
 
 def laden_mpc():
 	os.system("sudo /usr/bin/tvservice -o")
@@ -126,7 +146,7 @@ def power():
 	Max_Gebouw = 5
 	Gebouw = ['               ', 'Hekendorp       ', 'Oudewater       ', 'Hekendorp 2    ', 'Grootnieuws    ', 'RO 1           '];
 	currentChannel = 1
-	Volume = 50
+	Volume = 10
 	TIJD = datetime.now().strftime("%H:%M:%S")
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
@@ -167,7 +187,7 @@ def power():
 				test_aan = False
 #### Stream gebruik.
 
-		elif((GPIO.input(OP)==False) and test_aan):
+		elif((GPIO.input(RECHTS)==False) and test_aan):
 			lcd.display_string("netwerk", 1)
 			lcd.display_string("gebruik", 2)
 			test_aan = True
@@ -274,9 +294,7 @@ def power():
 
 ### cpu gebruik -----------------------------------
 			elif (menu3 and (GPIO.input(RECHTS)==False)):
-				CPU_Pct=str(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2))
-				lcd.display_string("CPU Usage", 1)
- 				lcd.display_string((str(CPU_Pct)),2)
+				CpuTest()
 				menu3 = False
 				menu4 = True
 
