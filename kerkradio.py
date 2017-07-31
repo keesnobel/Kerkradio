@@ -5,7 +5,6 @@
 # Twitter: @keesnobel
 
 import time
-import RPi.GPIO as GPIO
 import os
 import threading
 from time import sleep
@@ -15,37 +14,11 @@ from urllib2 import urlopen
 import commands
 from datetime import datetime
 import pyspeedtest
-import psutil
+import streamtest
+import gpio_conf
+import RPi.GPIO as GPIO
 
-#Button config
-POWER  = 24
-LINKS  = 18
-RECHTS = 17
-NEER   = 4
-OP     = 10
-LED    = 27
-RELAIS = 23
-
-def gpio_setup():
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(POWER,GPIO.IN, pull_up_down=GPIO.PUD_UP)       	
-	GPIO.setup(RECHTS,GPIO.IN, pull_up_down=GPIO.PUD_UP)	
-	GPIO.setup(LINKS,GPIO.IN, pull_up_down=GPIO.PUD_UP)	
-	GPIO.setup(OP,GPIO.IN, pull_up_down=GPIO.PUD_UP)			
-	GPIO.setup(NEER,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(LED, GPIO.OUT)
-	GPIO.setup(RELAIS, GPIO.OUT)
-
-def LedBlink(numTimes,speed):
-	for i in range(0,numTimes):
-		GPIO.output(LED,True)
-		time.sleep(speed)
-		GPIO.output(LED,False)
-		time.sleep(speed)
-iterations = 10
-speed = 0.1
-
-def test():
+def testoud():
 	count=0
 	qry=''
 	ul=0.00
@@ -58,8 +31,6 @@ def test():
 	while True:
 		sleep(0.3)
 		if((GPIO.input(OP)==False)):
-			return
-		if((GPIO.input(NEER)==False)):
 			return
 		last_up_down = up_down
 		upload=psutil.net_io_counters(pernic=True)['wlan0'][0]
@@ -75,7 +46,7 @@ def test():
 		if dl>0.1 or ul>=0.1:
 			time.sleep(0.75) 
 			lcd.display_string(('UL= {:0.2f} kB/s'.format(ul)), 1)
-			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
+			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)
 
 def laden_mpc():
 	os.system("sudo /usr/bin/tvservice -o")
@@ -90,7 +61,7 @@ def laden_mpc():
 	os.system("mpc add http://media01.streampartner.nl:8003/live")		# Reformatorische omroep
 
 def Afsluiten():
-	LedBlink(int(iterations),float(speed))
+	gpio_conf.LedBlink()
 	os.system("sudo /usr/bin/tvservice -p")
 	GPIO.output(RELAIS, 0)
 	lcd.display_string("", 1)
@@ -131,7 +102,7 @@ def power():
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
 	lcd.display_string("standby", 2)
-	LedBlink(int(iterations),float(speed))
+	gpio_conf.LedBlink()
 	GPIO.output(LED, 0)
 	GPIO.output(RELAIS, 0)
 	sleep(2)
@@ -172,7 +143,7 @@ def power():
 			lcd.display_string("gebruik", 2)
 			test_aan = True
 			echt_uit = False
-			test()
+			streamtest.test()
 			test_aan = False
 			lcd.display_string(Gebouw[currentChannel],1)
 			lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
@@ -292,7 +263,7 @@ def power():
 				lcd.display_string("tot zo", 2)
 				sleep(2)
 				lcd.backlight_off()
-				LedBlink(int(iterations),float(speed))
+				gpio_conf.LedBlink()
 				os.system("sudo reboot")
 
 ### Uitzetten -----------------------------------
@@ -307,7 +278,7 @@ def power():
 				lcd.display_string("Ziens", 2)
 				sleep(2)
 				lcd.backlight_off()
-				LedBlink(int(iterations),float(speed))
+				gpio_conf.LedBlink()
 				os.system("sudo shutdown -h now")
 
 ### HDMI aan/uit -----------------------------------
@@ -369,7 +340,7 @@ def power():
 
 
 if __name__ == '__main__':     # Program start from here		
-	gpio_setup()
+	gpio_conf.gpio_setup()
 	try:
 		power()
 	except KeyboardInterrupt:
