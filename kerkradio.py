@@ -16,6 +16,7 @@ import commands
 from datetime import datetime
 import pyspeedtest
 import psutil
+from subprocess import check_output
 
 #Button config
 POWER  = 24
@@ -68,7 +69,13 @@ def test():
 					while True:
 						LoadTest()
 						if((GPIO.input(LINKS)==False)):
-							return							
+							return
+						if ((GPIO.input(RECHTS)==False)):
+							while True:
+								essid()
+								if((GPIO.input(LINKS)==False)):
+									return
+									
 		last_up_down = up_down
 		upload=psutil.net_io_counters(pernic=True)['wlan0'][0]
 		download=psutil.net_io_counters(pernic=True)['wlan0'][1]
@@ -85,6 +92,17 @@ def test():
 			lcd.display_string(('UL= {:0.2f} kB/s'.format(ul)), 1)
 			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
 
+def essid():
+	scanoutput = check_output(["iwlist", "wlan0", "scan"])
+	ssid = "Geen WiFi"
+	for line in scanoutput.split():
+		line = line.decode("utf-8")
+		if line[:5]  == "ESSID":
+			ssid = line.split('"')[1]	
+	lcd.display_string("Netwerk", 1)
+	lcd.display_string((str(ssid)), 2)
+
+	
 def CpuTest():
 	CPU_Pct=psutil.cpu_percent()
 	lcd.display_string("CPU Usage", 1)
@@ -93,8 +111,9 @@ def CpuTest():
 
 def LoadTest():
 	Load=os.getloadavg()
+	st=Load[0]
 	lcd.display_string("Load average", 1)
- 	lcd.display_string((str(Load)),2)
+ 	lcd.display_string((str(st)),2)
 	time.sleep(0.2)
 
 def laden_mpc():
@@ -202,16 +221,17 @@ def power():
 		elif(GPIO.input(POWER)==False and power_closed==False and led_aan==False):
 			GPIO.output(LED, 1)
 			GPIO.output(RELAIS, 1)
+			essid()
+			time.sleep(2)
 			lcd.display_string("Welkom", 1)
-			lcd.display_string(str(DT), 2)
+			lcd.display_string("", 2)
 			laden_mpc()
 			led_aan = True
 			os.system("sudo mpc play " + str(currentChannel))
 			os.system("sudo mpc volume " + str(Volume))
-			time.sleep(3)
+			time.sleep(2)
 			lcd.display_string(Gebouw[currentChannel],1)
 			lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
-
 
 ###### Bediening menu ############################################################################
 
