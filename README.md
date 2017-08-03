@@ -3,8 +3,8 @@
 ## Kerkradio voor Oudewater & Hekendorp
 ### versie 2.0
 
-###Prototype 
+Prototype 
 ![dicht](Afbeeldingen/20170725_141258.jpg)
 
-###de binnenkant
+De binnenkant
 ![open](Afbeeldingen/20170725_141316.jpg)
