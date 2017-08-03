@@ -93,15 +93,9 @@ def test():
 			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
 
 def essid():
-	scanoutput = check_output(["iwlist", "wlan0", "scan"])
-	ssid = "Geen WiFi"
-	for line in scanoutput.split():
-		line = line.decode("utf-8")
-		if line[:5]  == "ESSID":
-			ssid = line.split('"')[1]	
+	scanoutput = check_output(["iwgetid", "wlan0", "-r"])
 	lcd.display_string("Netwerk", 1)
-	lcd.display_string((str(ssid)), 2)
-
+	lcd.display_string((str(scanoutput)), 2)
 	
 def CpuTest():
 	CPU_Pct=psutil.cpu_percent()
