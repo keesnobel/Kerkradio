@@ -1,7 +1,7 @@
 ![logo](Afbeeldingen/Logo-Oudewater-Hekendorp.jpeg)
 ## Kerkradio voor Oudewater & Hekendorp
 ### versie 2.0
-### voor meer info kijk op de wiki https://github.com/keesnobel/Kerkradio/wiki
+### voor meer info kijk op de [wiki](https://github.com/keesnobel/Kerkradio/wiki)
 ***
 Prototype 
 ![dicht](Afbeeldingen/20170725_141258.jpg)
