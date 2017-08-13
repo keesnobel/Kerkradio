@@ -1,5 +1,5 @@
 #!/usr/bin/python
-##
+###
 # Kerkradio versie 2.0
 # Kees Nobel
 # Twitter: @keesnobel
@@ -17,6 +17,7 @@ from datetime import datetime
 import pyspeedtest
 import psutil
 from subprocess import check_output
+import logging
 
 #Button config
 POWER  = 24
@@ -28,6 +29,7 @@ LED    = 27
 RELAIS = 23
 
 def gpio_setup():
+	GPIO.setwarnings(False)
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(POWER,GPIO.IN, pull_up_down=GPIO.PUD_UP)       	
 	GPIO.setup(RECHTS,GPIO.IN, pull_up_down=GPIO.PUD_UP)	
@@ -47,6 +49,7 @@ iterations = 10
 speed = 0.1
 
 def test():
+	logging.info("Test menu geopend")
 	count=0
 	qry=''
 	ul=0.00
@@ -59,22 +62,25 @@ def test():
 	while True:
 		sleep(0.3)
 		if((GPIO.input(LINKS)==False)):
+			logging.info("Test menu gesloten")
 			return
 		if((GPIO.input(RECHTS)==False)):
 			while True:
 				CpuTest()
 				if((GPIO.input(LINKS)==False)):
+					logging.info("Test menu gesloten")	
 					return
 				if ((GPIO.input(RECHTS)==False)):
 					while True:
 						LoadTest()
 						if((GPIO.input(LINKS)==False)):
+							logging.info("Test menu gesloten")
 							return
 						if ((GPIO.input(RECHTS)==False)):
-							while True:
-								essid()
-								if((GPIO.input(LINKS)==False)):
-									return
+							essid()
+							time.sleep(3)
+							logging.info("Test menu gesloten")
+							return
 									
 		last_up_down = up_down
 		upload=psutil.net_io_counters(pernic=True)['wlan0'][0]
@@ -91,11 +97,13 @@ def test():
 			time.sleep(0.5) 
 			lcd.display_string(('UL= {:0.2f} kB/s'.format(ul)), 1)
 			lcd.display_string(('DL= {:0.2f} kB/s'.format(dl)), 2)	
-
+			
 def essid():
 	scanoutput = check_output(["iwgetid", "wlan0", "-r"])
 	lcd.display_string("Netwerk", 1)
-	lcd.display_string((str(scanoutput)), 2)
+	lcd.display_string(str(scanoutput), 2)
+	logging.info("wifi_ap: " + str(scanoutput))
+
 	
 def CpuTest():
 	CPU_Pct=psutil.cpu_percent()
@@ -131,8 +139,9 @@ def Afsluiten():
 	lcd.backlight_off()
 	os.system("sudo mpc clear")
 	os.system("sudo mpc volume 0")
-	print("Alles afgesloten. EINDE")
+	logging.info("Alles afgesloten. EINDE")
 	GPIO.cleanup()
+
 
 def power():
 	power_closed = False
@@ -164,6 +173,7 @@ def power():
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
 	lcd.display_string("standby", 2)
+	logging.info("Kerkradio opgestart")
 	LedBlink(int(iterations),float(speed))
 	GPIO.output(LED, 0)
 	GPIO.output(RELAIS, 0)
@@ -183,6 +193,7 @@ def power():
 			lcd.display_string("druk uit knop !", 2)					
 			test_aan = True
 			if (GPIO.input(POWER)==False):
+				logging.info("Kerkradio uit")
 				echt_uit = True
 				GPIO.output(LED, 0)
 				power_closed = False
@@ -213,6 +224,7 @@ def power():
 ###### Werkelijk aan zetten
 
 		elif(GPIO.input(POWER)==False and power_closed==False and led_aan==False):
+			logging.info("Kerkradio aan")
 			GPIO.output(LED, 1)
 			GPIO.output(RELAIS, 1)
 			essid()
@@ -284,6 +296,7 @@ def power():
 
 		elif (led_aan==False and test_aan==False):	
 			if ((GPIO.input(LINKS)==False) and (GPIO.input(RECHTS)==False)):
+				logging.info("Systeem menu")
 				menu_aan = True
 				lcd.display_string("|< exit         ", 1)
 				lcd.display_string("     Volgende >|", 2)
@@ -294,6 +307,7 @@ def power():
 				my_ip = urlopen('http://ip.42.pl/raw').read()
 				lcd.display_string("externe ip        ", 1)
  				lcd.display_string((str(my_ip)),2)
+				logging.info("Externe_ip: " + str(my_ip))
 				menu1 = False
 				menu2 = True
 				menu9 = False
@@ -303,6 +317,7 @@ def power():
 				ipaddr = commands.getoutput("hostname -I")
 				lcd.display_string("interne ip        ", 1)
  				lcd.display_string((str(ipaddr)),2)
+				logging.info("Interne_ip: " + str(ipaddr))
 				menu2 = False
 				menu3 = True
 
@@ -322,6 +337,7 @@ def power():
 			elif (menu5 and (GPIO.input(OP)==False)):
 				lcd.display_string("Reboot", 1)
 				lcd.display_string("tot zo", 2)
+				logging.info("Reboot")
 				sleep(2)
 				lcd.backlight_off()
 				LedBlink(int(iterations),float(speed))
@@ -337,6 +353,7 @@ def power():
 			elif (menu6 and (GPIO.input(OP)==False)):
 				lcd.display_string("Tot", 1)
 				lcd.display_string("Ziens", 2)
+				logging.info("uit zetten")
 				sleep(2)
 				lcd.backlight_off()
 				LedBlink(int(iterations),float(speed))
@@ -394,18 +411,20 @@ def power():
 				menu_aan = False
 				lcd.display_string("Menu", 1)
 				lcd.display_string("exit", 2)
+				logging.info("Exit systeem menu")
 				sleep(2)
 				lcd.display_string("                ", 2)
 				lcd.backlight_off()
 		sleep(0.02)
 
-
 if __name__ == '__main__':     # Program start from here		
+	logging.basicConfig(level=logging.DEBUG, filename="/home/pi/kerkradio.log", filemode="a+",
+	format="%(asctime)-15s %(levelname)-8s %(message)s")
 	gpio_setup()
 	try:
 		power()
 	except KeyboardInterrupt:
-		print "  Exit kerkradio"
+		logging.info("Exit kerkradio")
 	finally:
 		Afsluiten()
 
