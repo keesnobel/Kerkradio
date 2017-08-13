@@ -168,7 +168,7 @@ def power():
 	Max_Gebouw = 5
 	Gebouw = ['               ', 'Hekendorp       ', 'Oudewater       ', 'Hekendorp 2    ', 'Grootnieuws    ', 'RO 1           '];
 	currentChannel = 1
-	Volume = 50
+	Volume = 10
 	TIJD = datetime.now().strftime("%H:%M:%S")
 	DT = datetime.now().strftime("%d-%m-%Y")
 	lcd.display_string("Welkom ", 1)
@@ -219,6 +219,7 @@ def power():
 			test()
 			test_aan = False
 			lcd.display_string(Gebouw[currentChannel],1)
+			logging.info(Gebouw[currentChannel])
 			lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
 
 ###### Werkelijk aan zetten
@@ -235,6 +236,7 @@ def power():
 			led_aan = True
 			os.system("sudo mpc play " + str(currentChannel))
 			os.system("sudo mpc volume " + str(Volume))
+			logging.info(Gebouw[currentChannel])
 			time.sleep(2)
 			lcd.display_string(Gebouw[currentChannel],1)
 			lcd.display_string(("Volume = " + str(Volume) + "     ") ,2)
@@ -277,6 +279,7 @@ def power():
 				if(currentChannel==0):
 					currentChannel = Max_Gebouw
 				lcd.display_string(Gebouw[currentChannel],1)
+				logging.info(Gebouw[currentChannel])
 				os.system("sudo mpc play " + str(currentChannel))
 
 ######## Rechts
@@ -289,6 +292,7 @@ def power():
 				if(currentChannel > Max_Gebouw):
 					currentChannel=1
 				lcd.display_string(Gebouw[currentChannel],1)
+				logging.info(Gebouw[currentChannel])
 				os.system("sudo mpc play " + str(currentChannel))
 
 ######## Beheer Menu #########################################################################################
@@ -429,3 +433,4 @@ if __name__ == '__main__':     # Program start from here
 		Afsluiten()
 
 ### einde
+
